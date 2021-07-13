@@ -95,7 +95,7 @@ class TaskURLTests(TestCase):
     def test_post_edit_url_redirect_login_user_on_same_page(self):
         response = self.authorized_watcher_client.get(
             f'/test_user/{self.post.pk}/edit/')
-        self.assertRedirects( response, f'/test_user/{self.post.pk}/')
+        self.assertRedirects(response, f'/test_user/{self.post.pk}/')
 
     def test_author_about_url_exists_at_desired_location(self):
         response = self.guest_client.get(reverse('about:author'))

@@ -41,7 +41,7 @@ class TaskCreateFormTests(TestCase):
             follow=True,
         )
         self.assertRedirects(response, reverse('index'))
-        self.assertEqual(Post.objects.count(), tasks_count+1)
+        self.assertEqual(Post.objects.count(), tasks_count + 1)
 
     def test_edit_post(self):
         form_data = {
