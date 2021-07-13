@@ -144,3 +144,9 @@ dmypy.json
 .history/
 
 .mypy_cache
+
+# Статика
+yatube/static
+yatube/htmlcov
+yatube/sent_emails
+
