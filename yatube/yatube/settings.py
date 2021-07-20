@@ -2,7 +2,6 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 SECRET_KEY = '3tm+kv3w*_k%t+e^+&acipi%+=r3x-4^d9ga6w+v-^fheev(9_'
 
 DEBUG = True
@@ -16,7 +15,6 @@ ALLOWED_HOSTS = [
     "testserver",
 ]
 
-
 INSTALLED_APPS = [
     'users',
     'posts',
@@ -26,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'sorl.thumbnail',
 ]
 
 MIDDLEWARE = [
@@ -96,22 +95,21 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
-# Login
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = 'index'
-# LOGOUT_REDIRECT_URL = 'index'
 
-#  подключаем движок filebased.EmailBackend
+
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-# указываем директорию, в которую будут складываться файлы писем
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
 
-print(os.path.dirname(__file__))
-print(os.path.dirname(os.path.abspath(__file__)))
-print(os.path.abspath(__file__))
-print(BASE_DIR)
-print(TEMPLATES_DIR)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}

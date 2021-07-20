@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "includes/base.html" %}
 
 {% block content %}
 <main role="main" class="container">
@@ -32,6 +32,12 @@
     <div class="col-md-9">
       {% for post in page %}
       <div class="card mb-3 mt-1 shadow-sm">
+  {% load thumbnail %}
+  {% thumbnail post.image "960x339" crop="center" upscale=True as im %}
+    <img class="card-img" src="{{ im.url }}">
+  {% endthumbnail %}
+      </div>
+      <div class="card mb-3 mt-1 shadow-sm">
         <div class="card-body">
           <p class="card-text">
             <a href="/{{ author.username }}/">
@@ -57,10 +63,10 @@
       </div>
       {% endfor %}
 
-      {% include "paginator.html" %}
+      {% include "includes/paginator.html" %}
 
       {% endblock %}
-      {% include 'nav.html' %}
+      {% include 'includes/nav.html' %}
     </div>
   </div>
 </main>

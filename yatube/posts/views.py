@@ -2,8 +2,9 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.cache import cache_page
 
-from .forms import PostForm
+from .forms import CommentForm, PostForm
 from .models import Group, Post, User
 
 
@@ -15,12 +16,13 @@ def get_items_paginator(request, item, item_per_page):
     return page
 
 
+@cache_page(20)
 def index(request):
     post_list = Post.objects.all()
     paginator = Paginator(post_list, settings.ELEMENTS_PAGINATOR)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
-    return render(request, "index.html", {"page": page})
+    return render(request, "posts/index.html", {"page": page})
 
 
 def group_posts(request, slug):
@@ -30,7 +32,7 @@ def group_posts(request, slug):
     """
     group = get_object_or_404(Group, slug=slug)
     page = get_items_paginator(request, group, settings.ELEMENTS_PAGINATOR)
-    return render(request, "group.html", {"group": group, "page": page})
+    return render(request, "posts/group.html", {"group": group, "page": page})
 
 
 def profile(request, username):
@@ -42,37 +44,84 @@ def profile(request, username):
 def post_view(request, username, post_id):
     author = get_object_or_404(User, username=username)
     post = get_object_or_404(Post, author=author, pk=post_id)
-    return render(request, "post.html", {"author": author, "post": post})
+    comments = post.comments.all()
+    form = CommentForm()
+    return render(
+        request,
+        "posts/post.html",
+        {"author": author, "post": post, "comments": comments, "form": form}
+    )
 
 
 @login_required
 def new_post(request):
     if request.method == "POST":
-        form = PostForm(request.POST)
+        form = PostForm(request.POST or None, files=request.FILES or None)
         if form.is_valid():
-            text = form.cleaned_data["text"]
-            group = form.cleaned_data["group"]
-            author = request.user
-            post = Post(text=text, group=group, author=author)
+            post = form.save(commit=False)
+            post.author = request.user
             post.save()
             return redirect("index")
-        return render(request, "new_post.html", {"form": form,
-                                                 "switch": "new"})
+        return render(
+            request,
+            "users/new_post.html",
+            {"form": form, "switch": "new"})
     form = PostForm()
-    return render(request, "new_post.html", {"form": form, "switch": "new"})
+    return render(
+        request,
+        "users/new_post.html",
+        {"form": form, "switch": "new"})
 
 
 @login_required
 def post_edit(request, username, post_id):
-    if request.user.username != username:
-        return redirect("post", username=username, post_id=post_id)
-    item = get_object_or_404(Post, id=post_id)
-    if request.method == "POST":
-        form = PostForm(request.POST, instance=item)
+    profile = get_object_or_404(User, username=username)
+    post = get_object_or_404(Post, pk=post_id, author=profile)
+    if request.user != profile:
+        return redirect('post', username=username, post_id=post_id)
+    form = PostForm(request.POST or None, files=request.FILES or None,
+                    instance=post)
+
+    if request.method == 'POST':
         if form.is_valid():
-            form.save()
-            return redirect("post", username=username, post_id=post_id)
-        return render(request, "new_post.html", {"form": form,
-                                                 "switch": "edit"})
-    form = PostForm(instance=item)
-    return render(request, "new_post.html", {"form": form, "switch": "edit"})
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect("post", username=request.user.username,
+                            post_id=post_id)
+
+    return render(
+        request, 'users/new_post.html', {'form': form, 'post': post},
+    )
+
+
+def page_not_found(request, exception):
+    return render(
+        request,
+        "misc/404.html",
+        {"path": request.path},
+        status=404
+    )
+
+
+def server_error(request):
+    return render(request, "misc/500.html", status=500)
+
+
+@login_required
+def add_comment(request, username, post_id):
+    author = get_object_or_404(User, username=username)
+    post = get_object_or_404(Post, author=author, pk=post_id)
+    form = CommentForm(request.POST or None)
+    comments = post.comments.all()
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.author = request.user
+        comment.post = post
+        comment.save()
+        return redirect("post", post_id=post_id, username=request.user.username)
+    return render(
+        request,
+        "posts/comments.html",
+        {"form": form, "comments": comments}
+    )

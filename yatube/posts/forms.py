@@ -1,17 +1,17 @@
 from django import forms
-from django.forms import ModelForm
 
-from .models import Post
+from .models import Comment, Post
 
 
-class PostForm(ModelForm):
+class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ("text", "group")
-        labels = {"text": "текст", "group'": "группа"}
+        fields = ("text", "group", "image")
+        labels = {"text": "текст", "group'": "группа", "image": "изображение"}
         help_texts = {
             "text": ("Напишете любой текст без мата"),
-            "group": ("А тут можно и с матом")
+            "group": ("А тут можно и с матом"),
+            "image": ("Добавь картинку смешную"),
         }
 
     def clean_text(self):
@@ -19,3 +19,13 @@ class PostForm(ModelForm):
         if not data:
             raise forms.ValidationError("Введите текст")
         return data
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ("text",)
+        labels = {"test": "текст"}
+        help_texts = {
+            "text": ("Напишете любой текст без мата"),
+        }
