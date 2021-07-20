@@ -8,6 +8,7 @@ from .forms import CommentForm, PostForm
 from .models import Group, Post, User
 
 
+@login_required
 def get_items_paginator(request, item, item_per_page):
     posts_list = item.posts.all()
     paginator = Paginator(posts_list, item_per_page)
