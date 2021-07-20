@@ -4,7 +4,6 @@ import tempfile
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -51,7 +50,6 @@ class TaskPagesTests(TestCase):
         super().tearDownClass()
 
     def setUp(self):
-        cache.clear()
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
@@ -166,7 +164,6 @@ class TaskPagesTests(TestCase):
 
 class PaginatorViewsTest(TestCase):
     def setUp(self):
-        cache.clear()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 

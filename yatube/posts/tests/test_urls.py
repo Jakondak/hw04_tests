@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
 
@@ -73,7 +72,6 @@ class TaskURLTests(TestCase):
                 self.assertEqual(response.status_code, 302)
 
     def test_urls_uses_correct_template(self):
-        cache.clear()
         templates_url_names = {
             'posts/index.html': '/',
             'posts/group.html': f'/{group_link}/{self.group.slug}/',
