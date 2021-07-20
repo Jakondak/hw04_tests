@@ -6,12 +6,11 @@ from .models import Comment, Post
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ("text", "group", "image")
-        labels = {"text": "текст", "group'": "группа", "image": "изображение"}
+        fields = ("text", "group",)
+        labels = {"text": "текст", "group'": "группа",}
         help_texts = {
             "text": ("Напишете любой текст без мата"),
             "group": ("А тут можно и с матом"),
-            "image": ("Добавь картинку смешную"),
         }
 
     def clean_text(self):
