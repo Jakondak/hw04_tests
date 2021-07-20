@@ -7,10 +7,10 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ("text", "group",)
-        labels = {"text": "текст", "group'": "группа",}
+        labels = {"text": "текст", "group'": "группа"}
         help_texts = {
             "text": ("Напишете любой текст без мата"),
-            "group": ("А тут можно и с матом"),
+            "group": ("А тут можно и с матом")
         }
 
     def clean_text(self):
