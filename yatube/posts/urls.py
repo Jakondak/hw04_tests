@@ -1,5 +1,5 @@
 from django.conf.urls import handler404, handler500  # noqa
-from django.urls import path, reverse
+from django.urls import path
 
 from . import views
 

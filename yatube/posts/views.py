@@ -119,7 +119,11 @@ def add_comment(request, username, post_id):
         comment.author = request.user
         comment.post = post
         comment.save()
-        return redirect("post", post_id=post_id, username=request.user.username)
+        return redirect(
+            "post",
+            post_id=post_id,
+            username=request.user.username
+        )
     return render(
         request,
         "posts/comments.html",
